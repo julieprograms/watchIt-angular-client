@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DescriptionViewComponent } from '../description-view/description-view.component';
 import { DirectorViewComponent } from '../director-view/director-view.component';
 import { GenreViewComponent } from '../genre-view/genre-view.component';
+import { Router } from '@angular/router';
 
 
 
@@ -21,18 +22,33 @@ export class MovieCardComponent implements OnInit {
  // empty states that gets populated in functions
   movies: any[] = [];
   favorited: any[] = [];
+  isInFavs: boolean = false;
+  username: any = localStorage.getItem('user');
+  user: any = JSON.parse(this.username);
+  currentUser: any = null;
+  currentFavs: any = null;
 
 
   constructor(
     public fetchApiData: FetchApiDataService,
     public dialog: MatDialog,
-    public snackBar: MatSnackBar
+    public snackBar: MatSnackBar,
+    public router: Router,
   ) { }
 
 
   ngOnInit(): void {
     this.getMovies()
     this.getFavorites()
+    this.getCurrentUser(this.user.Username);
+  }
+
+  getCurrentUser(username: string): void {
+    this.fetchApiData.getUser(username).subscribe((resp: any) => {
+      this.currentUser = resp;
+      this.currentFavs = resp.Favorites;
+      return (this.currentUser, this.currentFavs);
+    });
   }
 
 
@@ -65,11 +81,20 @@ export class MovieCardComponent implements OnInit {
     })
   }
 
+  openProfile(): void {
+    this.router.navigate(['profile']);
+  }
+
+  logOut(): void {
+    this.router.navigate(['welcome']);
+    localStorage.clear();
+  }
+
 
   getFavorites(): void {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.fetchApiData.getUser(user).subscribe((resp: any) => {
-      this.favorited = resp.FavoriteMovies;
+      this.favorited = resp.FavoriteMovies((movie: any) => movie._id);
       console.log(this.favorited);
       return this.favorited;
     });
@@ -97,6 +122,16 @@ export class MovieCardComponent implements OnInit {
       this.getFavorites()
       this.ngOnInit();
     });
+  }
+
+  toggleFavs(movieId: string): void {
+    if (this.currentFavs.filter(function (e: any) { return e._id === movieId; }).length > 0) {
+      this.removeFavMovie(movieId);
+      this.isInFavs = false;
+    } else {
+      this.addFavMovie(movieId)
+      this.isInFavs = true;
+    }
   }
 
   

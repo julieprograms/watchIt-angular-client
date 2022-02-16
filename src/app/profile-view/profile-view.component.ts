@@ -88,14 +88,12 @@ export class ProfileViewComponent implements OnInit {
     }
 
     this.fetchApiData.editUser(updatedData).subscribe((resp: any) => {
-      console.log(resp)
       this.snackBar.open("Profile updated", "OK", {
         duration: 4000
       });
       localStorage.setItem('user', resp.Username)
       this.getUser()
     }, (resp: any) => {
-      console.log(resp)
       this.snackBar.open("Failed to update", "OK", {
         duration: 4000
       });
