@@ -1,0 +1,48 @@
+.movies-page{
+    display: flex;
+    margin: 2%;
+}
+
+.movies-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 50px;
+  }
+  .mat-card {
+    background-color: rgba(8, 8, 8, 0.979);
+  }
+  .mat-card-header {
+    justify-content: center;
+    text-align: center;
+    height: 70px;
+  }
+  .mat-card-title {
+    color: #fc407f;
+  }
+  .mat-card-subtitle {
+    color: #fc407f;
+  }
+
+  .mat-card-actions {
+    display: flex;
+    height: 50px;
+  }
+  
+  .mat-button {
+    padding: 0;
+  }
+  .mat-icon-button {
+    color: #fc407f;
+    position: absolute;
+    right: 1.5%;
+    top: 1.5%;
+  }
+  
+  #action-btn { 
+    bottom: 2%;
+    left: 2%;
+
+  }
+  

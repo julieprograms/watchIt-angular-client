@@ -1,0 +1,27 @@
+.profile-div {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    flex-wrap: wrap;   
+};
+
+
+.watchlist-div {
+    justify-content: center;
+    width: 100%;
+    min-width:min-content;
+    background-color: rgba(8, 8, 8, 0.979);
+    color: #fc407f;
+    display: flex;
+    gap: 10px;
+};
+
+.details-card {
+width: 400px;
+};
+
+.details-div {
+    width: 400px;
+    margin-bottom: 10%;
+    margin-top: 10%;
+}

@@ -1,6 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+
+
+
 
 @Component({
   selector: 'app-profile-view',
@@ -11,80 +16,69 @@ export class ProfileViewComponent implements OnInit {
 
   @Input() userData = { Username: '', Password: '', Email: '', Birthday: '' }
 
-  movies: any[] = []
-  fav: any[] = []
-  favMovie: any = []
-  user: any = {}
+  UserFromStorage: any = localStorage.getItem('user');
+  currentUser: any = (JSON.parse(this.UserFromStorage));
+  currentUsername: any = this.currentUser.Username;
+  currentFavs: any = this.currentUser.Favorites;
+  favsEmpty: boolean = true;
+
 
   constructor(
     public fetchApiData: FetchApiDataService,
-    public snackBar: MatSnackBar
+    public router: Router,
+    public dialog: MatDialog,
+    public snackBar: MatSnackBar,
   ) { }
 
 
   ngOnInit(): void {
-    this.getUser()
-    this.getMovies()
-    this.getFav()
+    this.getCurrentUser(this.currentUsername);
   }
 
- getMovies(): void {
-    this.fetchApiData.getAllMovies().subscribe((resp: any) => {
-      this.movies = resp;
-      console.log(this.movies);
-      return this.movies;
+
+  backToMovies(): void {
+    this.router.navigate(['movies']);
+  }
+
+  logOut(): void {
+    this.router.navigate(['welcome']);
+    localStorage.clear();
+  }
+
+  getCurrentUser(currentUser: string): void {
+    this.fetchApiData.getUser(currentUser).subscribe((resp: any) => {
+      this.currentUser = resp;
+      this.currentFavs = this.currentUser.Favorites;
+      this.areFavsEmpty();
+      return this.currentUser;
     });
   }
 
-  filterFav(): void {
-    this.movies.forEach((movie: any) => {
-      if (this.fav.includes(movie._id)) {
-        this.favMovie.push(movie.Title);
-      }
-    });
-    console.log(this.favMovie);
-    return this.favMovie;
+  areFavsEmpty(): any {
+    if (this.currentFavs.length == 0) {
+      this.favsEmpty = true;
+    } else {
+      this.favsEmpty = false;
+    }
+    return this.favsEmpty;
   }
 
 
-  getFav(): void {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.fetchApiData.getUser(user).subscribe((resp: any) => {
-      this.fav = resp.FavoriteMovies((movie: any) => movie._id);
-      console.log(this.fav);
-      return this.filterFav();
-    });
-  }
-
-  removeFav(movieId: string, title: string): void {
-
-    this.fetchApiData.deleteMovie(movieId).subscribe((resp: any) => {
-      console.log(resp);
-      this.snackBar.open(`Removed ${title} from Watchlist`, 'OK', {
-        duration: 4000,
-      });
+  removeFromFavs(movieId: string): void {
+    this.fetchApiData.deleteFavMovie(this.currentUsername, movieId).subscribe((resp: any) => {
+      this.ngOnInit();
+      this.snackBar.open('Removed from favs', 'OK', { duration: 2000 });
     });
     this.ngOnInit();
-    return this.getFav();
-  }
-
-
-
-  getUser(): void {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.fetchApiData.getUser(user).subscribe((resp: any) => {
-      this.user = resp
-      return this.user
-    })
   }
 
 
   editUserInfo(): void {
     const updatedData = {
-      Username: this.userData.Username ? this.userData.Username : this.user.Username,
-      Password: this.userData.Password ? this.userData.Password : this.user.Password,
-      Email: this.userData.Email ? this.userData.Email : this.user.Email,
-      Birthday: this.userData.Birthday ? this.userData.Birthday : this.user.Birthday,
+      Username: this.userData.Username ? this.userData.Username : this.currentUser.Username,
+      Password: this.userData.Password ? this.userData.Password : this.currentUser.Password,
+      Email: this.userData.Email ? this.userData.Email : this.currentUser.Email,
+      Birthday: this.userData.Birthday ? this.userData.Birthday : this.currentUser.Birthday,
     }
 
     this.fetchApiData.editUser(updatedData).subscribe((resp: any) => {
@@ -92,11 +86,12 @@ export class ProfileViewComponent implements OnInit {
         duration: 4000
       });
       localStorage.setItem('user', resp.Username)
-      this.getUser()
+      this.getCurrentUser(this.currentUser.Username)
     }, (resp: any) => {
       this.snackBar.open("Failed to update", "OK", {
         duration: 4000
       });
     })
   }
+
 }

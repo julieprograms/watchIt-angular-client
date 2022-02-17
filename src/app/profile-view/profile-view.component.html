@@ -1,18 +1,23 @@
+<header style="background-color: black;">
+    <button (click)="backToMovies()" mat-raised-button color="accent" style="margin: 10px;width:100px;">Back</button>
+    <button (click)="logOut()" mat-raised-button color="accent" style="width:100px;">Log out</button>
+  </header>
+
 <div class="profile-div">
     <div class="watchlist-div">
         <h2>Watchlist</h2>
-        <ul *ngFor="let title of favMovie;">
+        <ul *ngFor="let title of currentFavs;">
             <li>{{title}}</li>
         </ul>
     </div>
     <div>
         <div class="details-div">
             <h2>Current Details</h2>
-            <p>Username: {{user.Username}}</p>
-            <p>Email: {{user.Email}}</p>
-            <p>Birthday: {{user?.Birthday | date }}</p>
+            <p>Username: {{currentUser.Username}}</p>
+            <p>Email: {{currentUser.Email}}</p>
+            <p>Birthday: {{currentUser?.Birthday | date }}</p>
         </div>
-        <mat-card>
+        <mat-card class="details-card">
             <mat-card-header>
                 <mat-card-title>Edit Your Profile</mat-card-title>
             </mat-card-header>
