@@ -1,3 +1,13 @@
+/**
+ * Renders a responsive grid of movie cards for each movie in the database.  
+ * Each movie card has an image, links to open dialogs for genre, director, and description 
+ * components, and a toggle button to add or remove the movie from the user's favorites.  
+ *   
+ * Also renders a BannerComponent.
+ * 
+ * @module MovieCardComponent
+ */
+
 import { Component, OnInit } from '@angular/core';
 import { FetchApiDataService } from '../fetch-api-data.service';
 
@@ -38,6 +48,17 @@ export class MovieCardComponent implements OnInit {
   }
 
 
+/**
+   * When the user loads the `/movies` page, loads in the movies and
+   * renders movie card elements.  
+   * Then, an array of the user's favorite movies by ID is fetched from
+   * the server and each movie that is in that list is marked as favorite.  
+   * 
+   * If this fails for any reason 
+   * (likely because the user is not logged in, or the token expired) 
+   * the localStorage gets cleared (logout) 
+   * and the user is redirected to the home page.
+   */
   getMovies(): void {
     this.fetchApiData.getAllMovies().subscribe((resp: any) => {
       this.movies = resp;
@@ -46,6 +67,10 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
+/**
+   * Fetches the logged in user's favorite movies from the server.  
+   * This function is called from [[MovieCardComponent.getMovies]].
+   */
   getFavoriteMovies(): void {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.fetchApiData.getUser(user).subscribe((resp: any) => {
@@ -55,6 +80,12 @@ export class MovieCardComponent implements OnInit {
   }
 
 
+/**
+   * 
+   * @param movie {Title: <string>, Summary: <string>, ... }  
+   * Opens a dialog box with a DescriptionComponent, passing the movie data
+   * into the component.
+   */
   openDescriptionDialog(title: string, description: string): void {
     this.dialog.open(DescriptionViewComponent, {
       data: { Title: title, Description: description },
@@ -62,6 +93,11 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
+/**
+   * @param director {Name: <string>, Bio: <string>, BirthYear: <string>}  
+   * Opens a dialog box with a DirectorComponent, passing the director 
+   * data into the component.
+   */
   openDirectorDialog(
     name: string,
     bio: string,
@@ -74,6 +110,12 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
+/**
+   * 
+   * @param genre {Name: <string>, Description: <string>}  
+   * Opens a dialog box with a GenreComponent, passing the genre data
+   * into the component.
+   */
    openGenreDialog(Name: string, Description: string): void {
     this.dialog.open(GenreViewComponent, {
       data: { Name: Name, Description: Description },
@@ -90,6 +132,15 @@ export class MovieCardComponent implements OnInit {
     localStorage.clear();
   }
 
+/**
+   * @param id string containing the ID of a movie to be added to the user's 
+   * list of favorite movies.  
+   * 
+   * Adds a movie to a user's list of favorites with a POST request via 
+   * [[FetchApiDataService.addFavoriteMovie]].  
+   * Then, changes the movie's star icon from emtpy to filled in 
+   * and displays a confirmation message.
+   */
   addFavoriteMovie(MovieID: string, title: string): void {
     this.fetchApiData.addFavoriteMovie(MovieID, this.user).subscribe((resp: any) => {
       this.snackBar.open(`${title} has been added to your Watchlist!`, 'OK', {
@@ -100,6 +151,15 @@ export class MovieCardComponent implements OnInit {
     return this.getFavoriteMovies();
   }
 
+/**
+   * @param id string containing the ID of a movie to be removed from the user's
+   * list of favorite movies.
+   * 
+   * Removes a movie from a user's list of favorites with a DELETE request via
+   * [[FetchApiDataService.removeFavoriteMovie]]. 
+   * Then, changes the movie's star icon from filled in to empty
+   * and displays a confirmation message.
+   */
   removeFavoriteMovie(MovieId: string, title: string): void {
     this.fetchApiData.deleteFavMovie(MovieId, this.user).subscribe((resp: any) => {
       console.log(resp);
@@ -120,6 +180,12 @@ export class MovieCardComponent implements OnInit {
   }
 
 
+/**
+   * Sets the isFavorite attribute of each movie to true or false.  
+   * This is called after fetching the favorites with 
+   * [[MovieCardComponent.getFavoriteMovies]] from within 
+   * [[MovieCardComponent.getMovies]].
+   */
   toggleFavorite(movie: any): void {
     this.isFavorite(movie._id)
       ? this.removeFavoriteMovie(movie._id, movie.Title)

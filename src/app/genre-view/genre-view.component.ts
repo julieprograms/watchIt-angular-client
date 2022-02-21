@@ -1,3 +1,10 @@
+/**
+ * The Genre component displays data about a genre and is implemented 
+ * when clicking on the "genre" button on a movie card.
+ * 
+ * @module GenreComponent
+ */
+
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 

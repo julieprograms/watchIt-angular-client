@@ -1,3 +1,10 @@
+/**
+ * The Description component is used to display a discription of a movie in a dialog box when 
+ * the user clicks the description button on a movie card.
+ * 
+ * @module DescriptionComponent
+ */
+
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -9,7 +16,12 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class DescriptionViewComponent implements OnInit {
 
-
+  /**
+   * 
+   * @param data An object containing movie data. Must have Title and Description parameters 
+   * both containing strings.
+   * 
+   */
   constructor(
     @Inject(MAT_DIALOG_DATA)
     public data: {
